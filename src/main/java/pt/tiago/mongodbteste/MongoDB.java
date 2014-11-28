@@ -5,14 +5,21 @@
  */
 package pt.tiago.mongodbteste;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.util.JSON;
+import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
+import pt.tiago.mondodbteste.dto.Adress;
+import pt.tiago.mondodbteste.dto.Person;
 
 /**
  *
@@ -23,13 +30,94 @@ public class MongoDB {
     private final static String user = "tiago";
     private static final String pass = "tiago";
     private static final String dbName = "contasdespesas";
+    private List<Person> personList;
+    private MongoClientURI clientURI;
+    private MongoClient client;
+    private DB db;
+    private DBCollection collection;
+    private String uri;
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws UnknownHostException {
-        // TODO code application logic here
+    public static void main(String[] args) throws UnknownHostException, IOException {
+        MongoDB mongo = new MongoDB();
 
+        mongo.createConnecntion();
+        mongo.populate();
+        mongo.doStuff();
+
+    }
+
+    public void doStuff() throws UnknownHostException {
+        clientURI = new MongoClientURI(uri);
+        client = new MongoClient(clientURI);
+        db = client.getDB(clientURI.getDatabase());
+        collection = db.getCollection("houses");
+
+        try {
+            for (Person person : personList) {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonObject = mapper.writeValueAsString(person);
+                DBObject dbObject = (DBObject) JSON.parse(jsonObject);
+                collection.insert(dbObject);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MongoDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public void populate() {
+        personList = new ArrayList<>();
+        Person p1 = new Person();
+        p1.setAdress(null);
+        p1.setAge(30);
+        p1.setName("tiago");
+        p1.setWorking(true);
+        p1.setWorkingYears(10);
+        Adress a1 = new Adress();
+        a1.setCity("lisboa");
+        a1.setCountry("portugal");
+        a1.setHouseNumber(91);
+        a1.setStreet("avenida das couves");
+        a1.setZip("2710-731");
+        p1.setAdress(a1);
+
+        Person p2 = new Person();
+        p2.setAdress(null);
+        p2.setAge(30);
+        p2.setName("jota");
+        p2.setWorking(true);
+        p2.setWorkingYears(10);
+        Adress a2 = new Adress();
+        a2.setCity("lisboa");
+        a2.setCountry("portugal");
+        a2.setHouseNumber(91);
+        a2.setStreet("avenida das couves");
+        a2.setZip("2710-731");
+        p2.setAdress(a2);
+
+        Person p3 = new Person();
+        p3.setAdress(null);
+        p3.setAge(30);
+        p3.setName("filipe");
+        p3.setWorking(true);
+        p3.setWorkingYears(10);
+        Adress a3 = new Adress();
+        a3.setCity("lisboa");
+        a3.setCountry("portugal");
+        a3.setHouseNumber(91);
+        a3.setStreet("avenida das couves");
+        a3.setZip("2710-731");
+        p1.setAdress(a3);
+
+        personList.add(p1);
+        personList.add(p2);
+        personList.add(p3);
+    }
+
+    private void createConnecntion() {
         StringBuilder str = new StringBuilder();
         str.append("mongodb://");
         str.append(user);
@@ -37,67 +125,7 @@ public class MongoDB {
         str.append(pass);
         str.append("@ds055690.mongolab.com:55690/");
         str.append(dbName);
-
-        final BasicDBObject[] seedData = createSeedData();
-
-        MongoClientURI uri = new MongoClientURI(str.toString());
-
-        MongoClient client = new MongoClient(uri);
-
-        DB db = client.getDB(uri.getDatabase());
-
-        DBCollection songs = db.getCollection("songs");
-
-        songs.insert(seedData);
-        
-        BasicDBObject updateQuery = new BasicDBObject("song", "One Sweet Day");
-        songs.update(updateQuery, new BasicDBObject("$set", new BasicDBObject("artist", "Mariah Carey ft. Boyz II Men")));
-        
-        /*
-         * Finally we run a query which returns all the hits that spent 10 
-         * or more weeks at number 1.
-         */
-      
-        BasicDBObject findQuery = new BasicDBObject("weeksAtOne", new BasicDBObject("$gte",10));
-        BasicDBObject orderBy = new BasicDBObject("decade", 1);
-
-        DBCursor docs = songs.find(findQuery).sort(orderBy);
-
-        while(docs.hasNext()){
-            DBObject doc = docs.next();
-            System.out.println(
-                "In the " + doc.get("decade") + ", " + doc.get("song") + 
-                " by " + doc.get("artist") + " topped the charts for " + 
-                doc.get("weeksAtOne") + " straight weeks."
-            );
-        }
-
-        client.close();
-    }
-
-    public static BasicDBObject[] createSeedData() {
-
-        BasicDBObject seventies = new BasicDBObject();
-        seventies.put("decade", "1970s");
-        seventies.put("artist", "Debby Boone");
-        seventies.put("song", "You Light Up My Life");
-        seventies.put("weeksAtOne", 10);
-
-        BasicDBObject eighties = new BasicDBObject();
-        eighties.put("decade", "1980s");
-        eighties.put("artist", "Olivia Newton-John");
-        eighties.put("song", "Physical");
-        eighties.put("weeksAtOne", 10);
-
-        BasicDBObject nineties = new BasicDBObject();
-        nineties.put("decade", "1990s");
-        nineties.put("artist", "Mariah Carey");
-        nineties.put("song", "One Sweet Day");
-        nineties.put("weeksAtOne", 16);
-
-        final BasicDBObject[] seedData = {seventies, eighties, nineties};
-
-        return seedData;
+        uri = str.toString();
     }
 
 }
