@@ -40,21 +40,20 @@ public class MongoDB {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws UnknownHostException, IOException {
+    public static void main(String[] args) {
         MongoDB mongo = new MongoDB();
-
-        mongo.createConnecntion();
-        mongo.populate();
-        mongo.doStuff();
-
+        try {
+            mongo.createConnecntion();
+            mongo.populate();
+            mongo.converJsonToDBObject();
+            mongo.closeConnections();
+            
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(MongoDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public void doStuff() throws UnknownHostException {
-        clientURI = new MongoClientURI(uri);
-        client = new MongoClient(clientURI);
-        db = client.getDB(clientURI.getDatabase());
-        collection = db.getCollection("houses");
-
+    public void converJsonToDBObject() {
         try {
             for (Person person : personList) {
                 ObjectMapper mapper = new ObjectMapper();
@@ -117,7 +116,7 @@ public class MongoDB {
         personList.add(p3);
     }
 
-    private void createConnecntion() {
+    private void createConnecntion() throws UnknownHostException {
         StringBuilder str = new StringBuilder();
         str.append("mongodb://");
         str.append(user);
@@ -126,6 +125,16 @@ public class MongoDB {
         str.append("@ds055690.mongolab.com:55690/");
         str.append(dbName);
         uri = str.toString();
+        clientURI = new MongoClientURI(uri);
+        client = new MongoClient(clientURI);
+        db = client.getDB(clientURI.getDatabase());
+        collection = db.getCollection("houses");
+    }
+
+    private void closeConnections() {
+        //uncomment this statement to drop collection
+        //collection.drop();
+        client.close();
     }
 
 }
