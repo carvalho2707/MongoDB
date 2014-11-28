@@ -45,7 +45,7 @@ public class MongoDB {
         MongoDB mongo = new MongoDB();
         try {
             mongo.createConnecntion();
-            mongo.populate();
+            mongo.setPersonList(Populator.populate());
             mongo.converJsonToDBObject();
             mongo.closeConnections();
             
@@ -68,54 +68,7 @@ public class MongoDB {
 
     }
 
-    public void populate() {
-        personList = new ArrayList<>();
-        Person p1 = new Person();
-        p1.setAdress(null);
-        p1.setAge(30);
-        p1.setName("tiago");
-        p1.setWorking(true);
-        p1.setWorkingYears(10);
-        Adress a1 = new Adress();
-        a1.setCity("lisboa");
-        a1.setCountry("portugal");
-        a1.setHouseNumber(91);
-        a1.setStreet("avenida das couves");
-        a1.setZip("2710-731");
-        p1.setAdress(a1);
-
-        Person p2 = new Person();
-        p2.setAdress(null);
-        p2.setAge(30);
-        p2.setName("jota");
-        p2.setWorking(true);
-        p2.setWorkingYears(10);
-        Adress a2 = new Adress();
-        a2.setCity("lisboa");
-        a2.setCountry("portugal");
-        a2.setHouseNumber(91);
-        a2.setStreet("avenida das couves");
-        a2.setZip("2710-731");
-        p2.setAdress(a2);
-
-        Person p3 = new Person();
-        p3.setAdress(null);
-        p3.setAge(30);
-        p3.setName("filipe");
-        p3.setWorking(true);
-        p3.setWorkingYears(10);
-        Adress a3 = new Adress();
-        a3.setCity("lisboa");
-        a3.setCountry("portugal");
-        a3.setHouseNumber(91);
-        a3.setStreet("avenida das couves");
-        a3.setZip("2710-731");
-        p1.setAdress(a3);
-
-        personList.add(p1);
-        personList.add(p2);
-        personList.add(p3);
-    }
+    
 
     private void createConnecntion() throws UnknownHostException {
         StringBuilder str = new StringBuilder();
@@ -139,5 +92,14 @@ public class MongoDB {
         //collection.remove(new BasicDBObject());
         client.close();
     }
+
+    public List<Person> getPersonList() {
+        return personList;
+    }
+
+    public void setPersonList(List<Person> personList) {
+        this.personList = personList;
+    }
+    
 
 }
