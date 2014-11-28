@@ -5,6 +5,7 @@
  */
 package pt.tiago.mongodbteste;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
@@ -134,6 +135,8 @@ public class MongoDB {
     private void closeConnections() {
         //uncomment this statement to drop collection
         //collection.drop();
+        //uncomment this statement to remove all documents from collection
+        //collection.remove(new BasicDBObject());
         client.close();
     }
 
