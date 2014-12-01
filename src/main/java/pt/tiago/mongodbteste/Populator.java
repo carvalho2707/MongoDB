@@ -59,10 +59,16 @@ public class Populator {
 
     public static List<Purchase> populatePurchase() {
         List<Purchase> purchaseList = new ArrayList<>();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 25; i++) {
             Purchase p1 = new Purchase();
-            p1.setItemName("MAC");
-            p1.setPrice(3.5f);
+            p1.setItemName("MAC" + i);
+            p1.setPrice(0.5f * i);
+            purchaseList.add(p1);
+        }
+        for (int i = 25; i < 50; i++) {
+            Purchase p1 = new Purchase();
+            p1.setItemName("MAC" + i);
+            p1.setPrice(0.5f * i);
             purchaseList.add(p1);
         }
 

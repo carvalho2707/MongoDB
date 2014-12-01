@@ -102,6 +102,11 @@ public class Purchase {
     public void setPersonID(int personID) {
         this.personID = personID;
     }
+
+    @Override
+    public String toString() {
+        return "Purchase{" + "ID=" + ID + ", ItemName=" + ItemName + ", Price=" + Price + ", person=" + person + ", category=" + category + ", subCategory=" + subCategory + ", DateOfPurchase=" + DateOfPurchase + ", categoryID=" + categoryID + ", subCategoryID=" + subCategoryID + ", personID=" + personID + '}';
+    }
     
     
 }

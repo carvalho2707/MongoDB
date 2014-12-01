@@ -5,14 +5,18 @@
  */
 package pt.tiago.mongodbteste;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.util.JSON;
+import de.undercouch.bson4jackson.types.ObjectId;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,11 +54,16 @@ public class MongoDB {
             mongo.setCategoryList(Populator.populateCategory());
             mongo.setPurchaseList(Populator.populatePurchase());
             mongo.converJsonToDBObject();
+            mongo.search();
             mongo.closeConnections();
 
         } catch (UnknownHostException ex) {
             Logger.getLogger(MongoDB.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public MongoDB() {
+        this.collection = new ArrayList<>();
     }
 
     public void converJsonToDBObject() {
@@ -95,16 +104,18 @@ public class MongoDB {
         clientURI = new MongoClientURI(uri);
         client = new MongoClient(clientURI);
         db = client.getDB(clientURI.getDatabase());
-        collection.set(0, db.getCollection("Category"));
-        collection.set(1, db.getCollection("Person"));
-        collection.set(2, db.getCollection("Purchase"));
+        collection.add(db.getCollection("Category"));
+        collection.add(db.getCollection("Person"));
+        collection.add(db.getCollection("Purchase"));
+        //uncomment this statement to remove all documents from collection
+        for (DBCollection collectionDB : collection) {
+            collectionDB.remove(new BasicDBObject());
+        }
     }
 
     private void closeConnections() {
         //uncomment this statement to drop collection
         //collection.drop();
-        //uncomment this statement to remove all documents from collection
-        //collection.remove(new BasicDBObject());
         client.close();
     }
 
@@ -130,6 +141,60 @@ public class MongoDB {
 
     public void setPurchaseList(List<Purchase> purchaseList) {
         this.purchaseList = purchaseList;
+    }
+
+    private void search() {
+        //search all... select * from
+        DBCursor cursor = collection.get(1).find();
+        while (cursor.hasNext()) {
+            DBObject obj = cursor.next();
+            BasicDBObject basicObj = (BasicDBObject) obj;
+            Person person = new Person();
+            person.setID(String.valueOf(basicObj.getObjectId("_id")));
+            person.setName(basicObj.getString("name"));
+            person.setSurname(basicObj.getString("surname"));
+            System.out.println(person.toString());
+        }
+        
+        //Select from Person where name = Tiago
+        System.out.println("------------------------------------");
+        BasicDBObject basicObj = new BasicDBObject("name","Tiago");
+        cursor = collection.get(1).find(basicObj);
+        while(cursor.hasNext()){
+            System.out.println(cursor.next());
+        }
+        
+        //Select from Person where name = Tiago and surname = Carvalho
+        System.out.println("------------------------------------");
+        basicObj = new BasicDBObject("name","Tiago").append("surname", "Carvalho");
+        cursor = collection.get(1).find(basicObj);
+        while(cursor.hasNext()){
+            System.out.println(cursor.next());
+        }
+        
+        //Select * from Person where name = Tiago and surname = Erro
+        System.out.println("------------------------------------");
+        basicObj = new BasicDBObject("name","Tiago").append("surname", "Erro");
+        cursor = collection.get(1).find(basicObj);
+        while(cursor.hasNext()){
+            System.out.println(cursor.next());
+        }
+        
+        //SELECT * FROM PERSON WHERE surname like '%arval%'
+        System.out.println("------------------------------------");
+        basicObj = new BasicDBObject("surname",  java.util.regex.Pattern.compile("arval"));
+        cursor = collection.get(1).find(basicObj);
+        while(cursor.hasNext()){
+            System.out.println(cursor.next());
+        }
+        //SELECT * FROM PERSON WHERE surname like '%arval%'
+        System.out.println("------------------------------------");
+        basicObj = new BasicDBObject();
+        basicObj.put("surname",  java.util.regex.Pattern.compile("arval"));
+        cursor = collection.get(1).find(basicObj);
+        while(cursor.hasNext()){
+            System.out.println(cursor.next());
+        }
     }
 
 }

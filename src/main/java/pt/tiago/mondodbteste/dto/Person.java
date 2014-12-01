@@ -13,16 +13,16 @@ import java.util.List;
  */
 public class Person {
      private static final long serialVersionUID = 1L;
-    private int ID;
+    private String ID;
     private String Name;
     private String Surname;
     private List<Purchase> purchases;
 
-    public int getID() {
+    public String getID() {
         return ID;
     }
 
-    public void setID(int ID) {
+    public void setID(String ID) {
         this.ID = ID;
     }
 
@@ -49,4 +49,10 @@ public class Person {
     public void setPurchases(List<Purchase> purchases) {
         this.purchases = purchases;
     }
+
+    @Override
+    public String toString() {
+        return "Person{" + "ID=" + ID + ", Name=" + Name + ", Surname=" + Surname + ", purchases=" + purchases + '}';
+    }
+    
 }

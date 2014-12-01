@@ -73,6 +73,10 @@ public class SubCategory {
     public void setCategoryDescription(String categoryDescription) {
         this.categoryDescription = categoryDescription;
     }
-    
+
+    @Override
+    public String toString() {
+        return "SubCategory{" + "ID=" + ID + ", Name=" + Name + ", Description=" + Description + ", Total=" + Total + ", categoryID=" + categoryID + ", categoryName=" + categoryName + ", categoryDescription=" + categoryDescription + '}';
+    }
     
 }

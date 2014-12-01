@@ -55,6 +55,10 @@ public class Category {
     public void setTotalByMonth(float[] TotalByMonth) {
         this.TotalByMonth = TotalByMonth;
     }
-    
+
+    @Override
+    public String toString() {
+        return "Category{" + "ID=" + ID + ", Name=" + Name + ", Description=" + Description + ", Total=" + Total + ", TotalByMonth=" + TotalByMonth + '}';
+    }
     
 }
