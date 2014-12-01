@@ -12,8 +12,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
-import de.undercouch.bson4jackson.types.ObjectId;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -43,9 +43,7 @@ public class MongoDB {
     private List<DBCollection> collection;
     private String uri;
 
-    /**
-     * @param args the command line arguments
-     */
+    
     public static void main(String[] args) {
         MongoDB mongo = new MongoDB();
         try {
@@ -53,7 +51,7 @@ public class MongoDB {
             mongo.setPersonList(Populator.populatePerson());
             mongo.setCategoryList(Populator.populateCategory());
             mongo.setPurchaseList(Populator.populatePurchase());
-            mongo.converJsonToDBObject();
+            mongo.converJsonToDBObjectAndInsert();
             mongo.search();
             mongo.closeConnections();
 
@@ -66,7 +64,7 @@ public class MongoDB {
         this.collection = new ArrayList<>();
     }
 
-    public void converJsonToDBObject() {
+    public void converJsonToDBObjectAndInsert() {
         try {
             for (Category category : categoryList) {
                 ObjectMapper mapper = new ObjectMapper();

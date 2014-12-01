@@ -5,6 +5,8 @@
  */
 package pt.tiago.mondodbteste.dto;
 
+import java.util.Arrays;
+
 /**
  *
  * @author NB20708
@@ -58,7 +60,7 @@ public class Category {
 
     @Override
     public String toString() {
-        return "Category{" + "ID=" + ID + ", Name=" + Name + ", Description=" + Description + ", Total=" + Total + ", TotalByMonth=" + TotalByMonth + '}';
+        return "Category{" + "ID=" + ID + ", Name=" + Name + ", Description=" + Description + ", Total=" + Total + ", TotalByMonth=" + Arrays.toString(TotalByMonth) + '}';
     }
     
 }

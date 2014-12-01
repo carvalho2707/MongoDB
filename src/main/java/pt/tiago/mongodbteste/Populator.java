@@ -7,6 +7,7 @@ package pt.tiago.mongodbteste;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bson.types.ObjectId;
 import pt.tiago.mondodbteste.dto.Category;
 import pt.tiago.mondodbteste.dto.Person;
 import pt.tiago.mondodbteste.dto.Purchase;

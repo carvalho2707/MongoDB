@@ -18,7 +18,7 @@ import org.codehaus.jackson.map.ser.impl.SimpleFilterProvider;
 public enum OdataPatchEnum {
 
     
-    PERSON {
+    CATEGORY {
 
                 /**
                  * @return
@@ -26,11 +26,11 @@ public enum OdataPatchEnum {
                 @Override
                 public FilterProvider getDefaultFilters() {
                     Set<String> toIgnoreChallenge = new HashSet<String>();
-                    toIgnoreChallenge.add("__id");
+                    toIgnoreChallenge.add("TotalByMonth");
                     
 
                     SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(toIgnoreChallenge);
-                    FilterProvider filters = new SimpleFilterProvider().addFilter("challengeFilter", theFilter);
+                    FilterProvider filters = new SimpleFilterProvider().addFilter("categoryFilter", theFilter);
 
                     return filters;
                 }
@@ -42,7 +42,37 @@ public enum OdataPatchEnum {
                 @Override
                 public FilterProvider getFiltersByFields(Set fields) {
                     SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(fields);
-                    FilterProvider filters = new SimpleFilterProvider().addFilter("personFilter", theFilter);
+                    FilterProvider filters = new SimpleFilterProvider().addFilter("categoryFilter", theFilter);
+
+                    return filters;
+                }
+            },
+    
+    PERSON {
+
+                /**
+                 * @return
+                 */
+                @Override
+                public FilterProvider getDefaultFilters() {
+                    Set<String> toIgnoreChallenge = new HashSet<String>();
+                    toIgnoreChallenge.add("purchases");
+                    
+
+                    SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(toIgnoreChallenge);
+                    FilterProvider filters = new SimpleFilterProvider().addFilter("categoryFilter", theFilter);
+
+                    return filters;
+                }
+
+                /**
+                 * @param fields
+                 * @return
+                 */
+                @Override
+                public FilterProvider getFiltersByFields(Set fields) {
+                    SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(fields);
+                    FilterProvider filters = new SimpleFilterProvider().addFilter("categoryFilter", theFilter);
 
                     return filters;
                 }

@@ -12,7 +12,8 @@ import java.util.List;
  * @author NB20708
  */
 public class Person {
-     private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 1L;
     private String ID;
     private String Name;
     private String Surname;
@@ -54,5 +55,5 @@ public class Person {
     public String toString() {
         return "Person{" + "ID=" + ID + ", Name=" + Name + ", Surname=" + Surname + ", purchases=" + purchases + '}';
     }
-    
+
 }
