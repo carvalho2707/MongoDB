@@ -5,7 +5,6 @@
  */
 package pt.tiago.mongodbteste;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
@@ -14,13 +13,13 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.util.JSON;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
-import pt.tiago.mondodbteste.dto.Adress;
+import pt.tiago.mondodbteste.dto.Category;
 import pt.tiago.mondodbteste.dto.Person;
+import pt.tiago.mondodbteste.dto.Purchase;
 
 /**
  *
@@ -32,10 +31,12 @@ public class MongoDB {
     private static final String pass = "tiago";
     private static final String dbName = "contasdespesas";
     private List<Person> personList;
+    private List<Category> categoryList;
+    private List<Purchase> purchaseList;
     private MongoClientURI clientURI;
     private MongoClient client;
     private DB db;
-    private DBCollection collection;
+    private List<DBCollection> collection;
     private String uri;
 
     /**
@@ -45,10 +46,12 @@ public class MongoDB {
         MongoDB mongo = new MongoDB();
         try {
             mongo.createConnecntion();
-            mongo.setPersonList(Populator.populate());
+            mongo.setPersonList(Populator.populatePerson());
+            mongo.setCategoryList(Populator.populateCategory());
+            mongo.setPurchaseList(Populator.populatePurchase());
             mongo.converJsonToDBObject();
             mongo.closeConnections();
-            
+
         } catch (UnknownHostException ex) {
             Logger.getLogger(MongoDB.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -56,19 +59,29 @@ public class MongoDB {
 
     public void converJsonToDBObject() {
         try {
+            for (Category category : categoryList) {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonObject = mapper.writeValueAsString(category);
+                DBObject dbObject = (DBObject) JSON.parse(jsonObject);
+                collection.get(0).insert(dbObject);
+            }
             for (Person person : personList) {
                 ObjectMapper mapper = new ObjectMapper();
                 String jsonObject = mapper.writeValueAsString(person);
                 DBObject dbObject = (DBObject) JSON.parse(jsonObject);
-                collection.insert(dbObject);
+                collection.get(1).insert(dbObject);
+            }
+            for (Purchase purchase : purchaseList) {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonObject = mapper.writeValueAsString(purchase);
+                DBObject dbObject = (DBObject) JSON.parse(jsonObject);
+                collection.get(2).insert(dbObject);
             }
         } catch (IOException ex) {
             Logger.getLogger(MongoDB.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
-
-    
 
     private void createConnecntion() throws UnknownHostException {
         StringBuilder str = new StringBuilder();
@@ -82,7 +95,9 @@ public class MongoDB {
         clientURI = new MongoClientURI(uri);
         client = new MongoClient(clientURI);
         db = client.getDB(clientURI.getDatabase());
-        collection = db.getCollection("houses");
+        collection.set(0, db.getCollection("Category"));
+        collection.set(1, db.getCollection("Person"));
+        collection.set(2, db.getCollection("Purchase"));
     }
 
     private void closeConnections() {
@@ -100,6 +115,21 @@ public class MongoDB {
     public void setPersonList(List<Person> personList) {
         this.personList = personList;
     }
-    
+
+    public List<Category> getCategoryList() {
+        return categoryList;
+    }
+
+    public void setCategoryList(List<Category> categoryList) {
+        this.categoryList = categoryList;
+    }
+
+    public List<Purchase> getPurchaseList() {
+        return purchaseList;
+    }
+
+    public void setPurchaseList(List<Purchase> purchaseList) {
+        this.purchaseList = purchaseList;
+    }
 
 }

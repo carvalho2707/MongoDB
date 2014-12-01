@@ -5,18 +5,16 @@
  */
 package pt.tiago.mondodbteste.dto;
 
-import java.util.List;
-
 /**
  *
  * @author NB20708
  */
-public class Person {
-     private static final long serialVersionUID = 1L;
+public class Category {
     private int ID;
     private String Name;
-    private String Surname;
-    private List<Purchase> purchases;
+    private String Description;
+    private float Total;
+    private float[] TotalByMonth;
 
     public int getID() {
         return ID;
@@ -34,19 +32,29 @@ public class Person {
         this.Name = Name;
     }
 
-    public String getSurname() {
-        return Surname;
+    public String getDescription() {
+        return Description;
     }
 
-    public void setSurname(String Surname) {
-        this.Surname = Surname;
+    public void setDescription(String Description) {
+        this.Description = Description;
     }
 
-    public List<Purchase> getPurchases() {
-        return purchases;
+    public float getTotal() {
+        return Total;
     }
 
-    public void setPurchases(List<Purchase> purchases) {
-        this.purchases = purchases;
+    public void setTotal(float Total) {
+        this.Total = Total;
     }
+
+    public float[] getTotalByMonth() {
+        return TotalByMonth;
+    }
+
+    public void setTotalByMonth(float[] TotalByMonth) {
+        this.TotalByMonth = TotalByMonth;
+    }
+    
+    
 }
