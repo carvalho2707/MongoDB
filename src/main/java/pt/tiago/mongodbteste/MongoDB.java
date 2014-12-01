@@ -157,7 +157,7 @@ public class MongoDB {
         }
         
         //Select from Person where name = Tiago
-        System.out.println("------------------------------------");
+        System.out.println("------------------------------------------------------------------------");
         BasicDBObject basicObj = new BasicDBObject("name","Tiago");
         cursor = collection.get(1).find(basicObj);
         while(cursor.hasNext()){
@@ -165,7 +165,7 @@ public class MongoDB {
         }
         
         //Select from Person where name = Tiago and surname = Carvalho
-        System.out.println("------------------------------------");
+        System.out.println("------------------------------------------------------------------------");
         basicObj = new BasicDBObject("name","Tiago").append("surname", "Carvalho");
         cursor = collection.get(1).find(basicObj);
         while(cursor.hasNext()){
@@ -173,7 +173,7 @@ public class MongoDB {
         }
         
         //Select * from Person where name = Tiago and surname = Erro
-        System.out.println("------------------------------------");
+        System.out.println("------------------------------------------------------------------------");
         basicObj = new BasicDBObject("name","Tiago").append("surname", "Erro");
         cursor = collection.get(1).find(basicObj);
         while(cursor.hasNext()){
@@ -181,14 +181,14 @@ public class MongoDB {
         }
         
         //SELECT * FROM PERSON WHERE surname like '%arval%'
-        System.out.println("------------------------------------");
+        System.out.println("------------------------------------------------------------------------");
         basicObj = new BasicDBObject("surname",  java.util.regex.Pattern.compile("arval"));
         cursor = collection.get(1).find(basicObj);
         while(cursor.hasNext()){
             System.out.println(cursor.next());
         }
         //SELECT * FROM PERSON WHERE surname like '%arval%'
-        System.out.println("------------------------------------");
+        System.out.println("------------------------------------------------------------------------");
         basicObj = new BasicDBObject();
         basicObj.put("surname",  java.util.regex.Pattern.compile("arval"));
         cursor = collection.get(1).find(basicObj);
