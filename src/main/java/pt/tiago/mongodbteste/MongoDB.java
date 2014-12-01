@@ -12,7 +12,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -43,7 +42,6 @@ public class MongoDB {
     private List<DBCollection> collection;
     private String uri;
 
-    
     public static void main(String[] args) {
         MongoDB mongo = new MongoDB();
         try {
@@ -153,44 +151,44 @@ public class MongoDB {
             person.setSurname(basicObj.getString("surname"));
             System.out.println(person.toString());
         }
-        
+
         //Select from Person where name = Tiago
         System.out.println("------------------------------------------------------------------------");
-        BasicDBObject basicObj = new BasicDBObject("name","Tiago");
+        BasicDBObject basicObj = new BasicDBObject("name", "Tiago");
         cursor = collection.get(1).find(basicObj);
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             System.out.println(cursor.next());
         }
-        
+
         //Select from Person where name = Tiago and surname = Carvalho
         System.out.println("------------------------------------------------------------------------");
-        basicObj = new BasicDBObject("name","Tiago").append("surname", "Carvalho");
+        basicObj = new BasicDBObject("name", "Tiago").append("surname", "Carvalho");
         cursor = collection.get(1).find(basicObj);
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             System.out.println(cursor.next());
         }
-        
+
         //Select * from Person where name = Tiago and surname = Erro
         System.out.println("------------------------------------------------------------------------");
-        basicObj = new BasicDBObject("name","Tiago").append("surname", "Erro");
+        basicObj = new BasicDBObject("name", "Tiago").append("surname", "Erro");
         cursor = collection.get(1).find(basicObj);
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             System.out.println(cursor.next());
         }
-        
+
         //SELECT * FROM PERSON WHERE surname like '%arval%'
         System.out.println("------------------------------------------------------------------------");
-        basicObj = new BasicDBObject("surname",  java.util.regex.Pattern.compile("arval"));
+        basicObj = new BasicDBObject("surname", java.util.regex.Pattern.compile("arval"));
         cursor = collection.get(1).find(basicObj);
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             System.out.println(cursor.next());
         }
         //SELECT * FROM PERSON WHERE surname like '%arval%'
         System.out.println("------------------------------------------------------------------------");
         basicObj = new BasicDBObject();
-        basicObj.put("surname",  java.util.regex.Pattern.compile("arval"));
+        basicObj.put("surname", java.util.regex.Pattern.compile("arval"));
         cursor = collection.get(1).find(basicObj);
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             System.out.println(cursor.next());
         }
     }
