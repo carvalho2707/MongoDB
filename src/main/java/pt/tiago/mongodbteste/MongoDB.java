@@ -43,11 +43,11 @@ public class MongoDB {
         MongoDB mongo = new MongoDB();
         try {
             mongo.createConnecntion();
-            mongo.setPersonList(Populator.populatePerson());
-            mongo.setCategoryList(Populator.populateCategory());
-            mongo.setPurchaseList(Populator.populatePurchase());
-            mongo.converJsonToDBObjectAndInsert();
-            mongo.search();
+//            mongo.setPersonList(Populator.populatePerson());
+//            mongo.setCategoryList(Populator.populateCategory());
+//            mongo.setPurchaseList(Populator.populatePurchase());
+//            mongo.converJsonToDBObjectAndInsert();
+//            mongo.search();
             mongo.closeConnections();
 
         } catch (UnknownHostException ex) {
@@ -61,10 +61,6 @@ public class MongoDB {
 
     public void converJsonToDBObjectAndInsert() {
         for (Category category : categoryList) {
-//                ObjectMapper mapper = new ObjectMapper();
-//                String jsonObject = mapper.writeValueAsString(category);
-//                DBObject dbObject = (DBObject) JSON.parse(jsonObject);
-//                collection.get(0).insert(dbObject);
             BasicDBObject doc = new BasicDBObject()
                     .append("name", category.getName())
                     .append("description", category.getDescription());
