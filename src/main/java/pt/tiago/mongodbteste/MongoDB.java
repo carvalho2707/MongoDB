@@ -12,14 +12,11 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.mongodb.util.JSON;
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 import pt.tiago.mondodbteste.dto.Category;
 import pt.tiago.mondodbteste.dto.Person;
 import pt.tiago.mondodbteste.dto.Purchase;
@@ -63,27 +60,36 @@ public class MongoDB {
     }
 
     public void converJsonToDBObjectAndInsert() {
-        try {
-            for (Category category : categoryList) {
-                ObjectMapper mapper = new ObjectMapper();
-                String jsonObject = mapper.writeValueAsString(category);
-                DBObject dbObject = (DBObject) JSON.parse(jsonObject);
-                collection.get(0).insert(dbObject);
-            }
-            for (Person person : personList) {
-                ObjectMapper mapper = new ObjectMapper();
-                String jsonObject = mapper.writeValueAsString(person);
-                DBObject dbObject = (DBObject) JSON.parse(jsonObject);
-                collection.get(1).insert(dbObject);
-            }
-            for (Purchase purchase : purchaseList) {
-                ObjectMapper mapper = new ObjectMapper();
-                String jsonObject = mapper.writeValueAsString(purchase);
-                DBObject dbObject = (DBObject) JSON.parse(jsonObject);
-                collection.get(2).insert(dbObject);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(MongoDB.class.getName()).log(Level.SEVERE, null, ex);
+        for (Category category : categoryList) {
+//                ObjectMapper mapper = new ObjectMapper();
+//                String jsonObject = mapper.writeValueAsString(category);
+//                DBObject dbObject = (DBObject) JSON.parse(jsonObject);
+//                collection.get(0).insert(dbObject);
+            BasicDBObject doc = new BasicDBObject()
+                    .append("name", category.getName())
+                    .append("description", category.getDescription());
+            collection.get(0).insert(doc);
+        }
+        for (Person person : personList) {
+//                ObjectMapper mapper = new ObjectMapper();
+//                String jsonObject = mapper.writeValueAsString(person);
+//                DBObject dbObject = (DBObject) JSON.parse(jsonObject);
+//                collection.get(1).insert(dbObject);
+            BasicDBObject doc = new BasicDBObject()
+                    .append("name", person.getName())
+                    .append("surname", person.getSurname());
+            collection.get(1).insert(doc);
+
+        }
+        for (Purchase purchase : purchaseList) {
+            //ObjectMapper mapper = new ObjectMapper();
+            //String jsonObject = mapper.writeValueAsString(purchase);
+            //DBObject dbObject = (DBObject) JSON.parse(jsonObject);
+            BasicDBObject doc = new BasicDBObject()
+                    .append("itemName", purchase.getItemName())
+                    .append("price", purchase.getPrice())
+                    .append("dateOfPurchase", purchase.getDateOfPurchase());
+            collection.get(2).insert(doc);
         }
 
     }

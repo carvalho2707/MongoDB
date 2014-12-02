@@ -17,7 +17,6 @@ import org.codehaus.jackson.map.ser.impl.SimpleFilterProvider;
  */
 public enum OdataPatchEnum {
 
-    
     CATEGORY {
 
                 /**
@@ -27,7 +26,6 @@ public enum OdataPatchEnum {
                 public FilterProvider getDefaultFilters() {
                     Set<String> toIgnoreChallenge = new HashSet<String>();
                     toIgnoreChallenge.add("TotalByMonth");
-                    
 
                     SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(toIgnoreChallenge);
                     FilterProvider filters = new SimpleFilterProvider().addFilter("categoryFilter", theFilter);
@@ -47,7 +45,6 @@ public enum OdataPatchEnum {
                     return filters;
                 }
             },
-    
     PERSON {
 
                 /**
@@ -57,7 +54,6 @@ public enum OdataPatchEnum {
                 public FilterProvider getDefaultFilters() {
                     Set<String> toIgnoreChallenge = new HashSet<String>();
                     toIgnoreChallenge.add("purchases");
-                    
 
                     SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(toIgnoreChallenge);
                     FilterProvider filters = new SimpleFilterProvider().addFilter("categoryFilter", theFilter);
