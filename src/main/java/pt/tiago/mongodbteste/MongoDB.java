@@ -5,8 +5,8 @@
  */
 package pt.tiago.mongodbteste;
 
+import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static javax.management.Query.match;
 import pt.tiago.mondodbteste.dto.Category;
 import pt.tiago.mondodbteste.dto.Person;
 import pt.tiago.mondodbteste.dto.Purchase;
@@ -52,6 +53,7 @@ public class MongoDB {
 //            mongo.search();
 //            mongo.testReferences();
 //           mongo.calculateSum();
+            mongo.distinct();
             mongo.closeConnections();
 
         } catch (UnknownHostException ex) {
@@ -110,9 +112,9 @@ public class MongoDB {
         collection.add(db.getCollection("Person"));
         collection.add(db.getCollection("Purchase"));
         //uncomment this statement to remove all documents from collection
-        for (DBCollection collectionDB : collection) {
-            collectionDB.remove(new BasicDBObject());
-        }
+//        for (DBCollection collectionDB : collection) {
+//            collectionDB.remove(new BasicDBObject());
+//        }
     }
 
     private void closeConnections() {
@@ -236,4 +238,32 @@ public class MongoDB {
 //        DBObject group = new BasicDBObject("$group", groupFields);
     }
 
+    private void distinct() {
+
+        DBCollection coll = db.getCollection("Purchase");
+        //find the sum group by category
+        //DBObject project = new BasicDBObject("$project", new BasicDBObject("categoryID", 1) .append("price", 1));
+        DBObject group = new BasicDBObject("$group", new BasicDBObject("_id", "$categoryID").append("total", new BasicDBObject("$sum", "$price")));
+        DBObject sort = new BasicDBObject("$sort", new BasicDBObject("price", 1));
+        AggregationOutput output = coll.aggregate(group, sort);
+        for (DBObject result : output.results()) {
+            System.out.println(result);
+        }
+
+        System.out.println("////////////////////////////////");
+
+        //find the year of date
+        //SELECT DISTINCT(YEAR(DateOfPurchase)) AS ano FROM Purchase
+        // $group : {_id : { year : {$year : "$birth_date"}},  total : {$sum : 1}
+        DBCollection collection2 = db.getCollection("Purchase");
+        group = new BasicDBObject("$group", new BasicDBObject("_id", new BasicDBObject("year", new BasicDBObject("$year", "$dateOfPurchase"))).append("total", new BasicDBObject("$sum", 1)));
+        output = collection2.aggregate(group);
+        BasicDBObject basicObj;
+        for (DBObject result : output.results()) {
+            basicObj = (BasicDBObject) result;
+            basicObj = (BasicDBObject)basicObj.get("_id");
+            System.out.println(basicObj.get("year"));;
+            
+        }
+    }
 }
