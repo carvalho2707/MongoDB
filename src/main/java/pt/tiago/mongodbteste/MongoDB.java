@@ -6,10 +6,12 @@
 package pt.tiago.mongodbteste;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import java.net.UnknownHostException;
@@ -48,6 +50,8 @@ public class MongoDB {
 //            mongo.setPurchaseList(Populator.populatePurchase());
 //            mongo.converJsonToDBObjectAndInsert();
 //            mongo.search();
+//            mongo.testReferences();
+//           mongo.calculateSum();
             mongo.closeConnections();
 
         } catch (UnknownHostException ex) {
@@ -60,12 +64,12 @@ public class MongoDB {
     }
 
     public void converJsonToDBObjectAndInsert() {
-        for (Category category : categoryList) {
-            BasicDBObject doc = new BasicDBObject()
-                    .append("name", category.getName())
-                    .append("description", category.getDescription());
-            collection.get(0).insert(doc);
-        }
+//        for (Category category : categoryList) {
+//            BasicDBObject doc = new BasicDBObject()
+//                    .append("name", category.getName())
+//                    .append("description", category.getDescription());
+//            collection.get(0).insert(doc);
+//        }
         for (Person person : personList) {
 //                ObjectMapper mapper = new ObjectMapper();
 //                String jsonObject = mapper.writeValueAsString(person);
@@ -77,16 +81,16 @@ public class MongoDB {
             collection.get(1).insert(doc);
 
         }
-        for (Purchase purchase : purchaseList) {
-            //ObjectMapper mapper = new ObjectMapper();
-            //String jsonObject = mapper.writeValueAsString(purchase);
-            //DBObject dbObject = (DBObject) JSON.parse(jsonObject);
-            BasicDBObject doc = new BasicDBObject()
-                    .append("itemName", purchase.getItemName())
-                    .append("price", purchase.getPrice())
-                    .append("dateOfPurchase", purchase.getDateOfPurchase());
-            collection.get(2).insert(doc);
-        }
+//        for (Purchase purchase : purchaseList) {
+//            //ObjectMapper mapper = new ObjectMapper();
+//            //String jsonObject = mapper.writeValueAsString(purchase);
+//            //DBObject dbObject = (DBObject) JSON.parse(jsonObject);
+//            BasicDBObject doc = new BasicDBObject()
+//                    .append("itemName", purchase.getItemName())
+//                    .append("price", purchase.getPrice())
+//                    .append("dateOfPurchase", purchase.getDateOfPurchase());
+//            collection.get(2).insert(doc);
+//        }
 
     }
 
@@ -193,6 +197,43 @@ public class MongoDB {
         while (cursor.hasNext()) {
             System.out.println(cursor.next());
         }
+    }
+
+    private void testReferences() {
+        DBCursor cursor = collection.get(1).find();
+        while (cursor.hasNext()) {
+            DBObject obj = cursor.next();
+            BasicDBObject basicObj = (BasicDBObject) obj;
+            Person person = new Person();
+            person.setID(String.valueOf(basicObj.getObjectId("_id")));
+            person.setName(basicObj.getString("name"));
+            person.setSurname(basicObj.getString("surname"));
+            DBRef addressRef = new DBRef(db, "Person", basicObj.getObjectId("_id"));
+            DBObject address = addressRef.fetch();
+            BasicDBObject doc = new BasicDBObject()
+                    .append("name", person.getName())
+                    .append("surname", person.getSurname())
+                    .append("pai", basicObj.getObjectId("_id"));
+            collection.get(1).save(doc);
+        }
+    }
+
+    /**
+     * SELECT SUM(Price) AS Sumatorio, MONTH(DateOfPurchase) AS Mes, CategoryID
+     * FROM Purchase GROUP BY CategoryID ,MONTH(DateOfPurchase);
+     *
+     * @return
+     */
+    private void calculateSum() {
+//        collection.add(db.getCollection("Category"));
+//        DBObject fields = new BasicDBObject("department", 1);
+//        fields.put("price", 1);
+//        fields.put("_id", 0);
+//        DBObject project = new BasicDBObject("$project", fields);
+//        
+//        DBObject groupFields = new BasicDBObject("_id", "$department");
+//        groupFields.put("average", new BasicDBObject("$avg", "$amount"));
+//        DBObject group = new BasicDBObject("$group", groupFields);
     }
 
 }
