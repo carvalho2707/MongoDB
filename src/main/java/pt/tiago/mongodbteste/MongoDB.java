@@ -287,6 +287,35 @@ public class MongoDB {
             System.out.println(basicObj.toString());
         }
 
+        System.out.println("////////////////////////////////");
+
+        System.out.println("SELECT SUM(Price) , PersonID FROM Purchase WHERE  "
+                + "YEAR(DateOfPurchase) = ? AND Price <= ? GROUP BY PersonID");
+        coll = db.getCollection("Purchase");
+        year = 2014;
+        cal = Calendar.getInstance();
+        cal.set(year, 0, 0);
+        cal2 = Calendar.getInstance();
+        cal2.set(year, 11, 31);
+
+        BasicDBObject priceObj = new BasicDBObject("price", new BasicDBObject("$lte", 2000));
+        BasicDBObject dateObj = new BasicDBObject("dateOfPurchase", new BasicDBObject("$gte", cal.getTime()).append("$lt", cal2.getTime()));
+        and = new BasicDBList();
+        and.add(priceObj);
+        and.add(dateObj);
+        andCriteria = new BasicDBObject("$and", and);
+        matchCriteria = new BasicDBObject("$match", andCriteria);
+        group = new BasicDBObject(
+                "$group", new BasicDBObject("_id", "$personID").append(
+                        "total", new BasicDBObject("$sum", "$price")
+                )
+        );
+        output = coll.aggregate(matchCriteria, group);
+        for (DBObject result : output.results()) {
+            basicObj = (BasicDBObject) result;
+            System.out.println(basicObj.toString());
+        }
+
     }
 
     private void emptyCollections() {
