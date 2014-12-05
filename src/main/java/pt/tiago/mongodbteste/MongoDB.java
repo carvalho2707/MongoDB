@@ -6,6 +6,7 @@
 package pt.tiago.mongodbteste;
 
 import com.mongodb.AggregationOutput;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -53,9 +54,10 @@ public class MongoDB {
 //            mongo.converJsonToDBObjectAndInsert();
 //            mongo.search();
 //            mongo.testReferences();
-            mongo.queries();
+//            mongo.queries();
 //            mongo.emptyCollections();
 //           mongo.dropCollections();
+            mongo.testStuff();
             mongo.closeConnections();
 
         } catch (UnknownHostException ex) {
@@ -259,6 +261,32 @@ public class MongoDB {
             basicObj = (BasicDBObject) result;
             System.out.println(basicObj.getDouble("total"));
         }
+
+        System.out.println("////////////////////////////////");
+
+        System.out.println("SELECT SUM(Price) , MONTH(DateOfPurchase)"
+                + " FROM Purchase WHERE PersonID = ? AND CategoryID = ? "
+                + "AND Price <= ? GROUP BY MONTH(DateOfPurchase)");
+        coll = db.getCollection("Purchase");
+        BasicDBObject cateObj = new BasicDBObject("categoryID", new ObjectId("548089fc46e68338719aa1f8"));
+        BasicDBObject personObj = new BasicDBObject("personID", new ObjectId("548079fa46e68338719aa1f6"));
+        BasicDBList and = new BasicDBList();
+        and.add(cateObj);
+        and.add(personObj);
+        DBObject andCriteria = new BasicDBObject("$and", and);
+        DBObject matchCriteria = new BasicDBObject("$match", andCriteria);
+        group = new BasicDBObject(
+                "$group", new BasicDBObject("_id", null).append(
+                        "total", new BasicDBObject("$sum", "$price")
+                )
+        );
+        group.put("$group", new BasicDBObject("_id", new BasicDBObject("month", new BasicDBObject("$month", "$dateOfPurchase"))).append("total", new BasicDBObject("$sum", "$price")));
+        output = coll.aggregate(matchCriteria, group);
+        for (DBObject result : output.results()) {
+            basicObj = (BasicDBObject) result;
+            System.out.println(basicObj.toString());
+        }
+
     }
 
     private void emptyCollections() {
@@ -271,5 +299,9 @@ public class MongoDB {
         for (DBCollection collectionDB : collection) {
             collectionDB.drop();
         }
+    }
+
+    private void testStuff() {
+
     }
 }
