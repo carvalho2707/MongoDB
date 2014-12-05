@@ -16,10 +16,11 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static javax.management.Query.match;
+import org.bson.types.ObjectId;
 import pt.tiago.mondodbteste.dto.Category;
 import pt.tiago.mondodbteste.dto.Person;
 import pt.tiago.mondodbteste.dto.Purchase;
@@ -52,8 +53,9 @@ public class MongoDB {
 //            mongo.converJsonToDBObjectAndInsert();
 //            mongo.search();
 //            mongo.testReferences();
-//           mongo.calculateSum();
-            mongo.distinct();
+            mongo.queries();
+//            mongo.emptyCollections();
+//           mongo.dropCollections();
             mongo.closeConnections();
 
         } catch (UnknownHostException ex) {
@@ -66,34 +68,26 @@ public class MongoDB {
     }
 
     public void converJsonToDBObjectAndInsert() {
-//        for (Category category : categoryList) {
-//            BasicDBObject doc = new BasicDBObject()
-//                    .append("name", category.getName())
-//                    .append("description", category.getDescription());
-//            collection.get(0).insert(doc);
-//        }
+        for (Category category : categoryList) {
+            BasicDBObject doc = new BasicDBObject()
+                    .append("name", category.getName())
+                    .append("description", category.getDescription());
+            collection.get(0).insert(doc);
+        }
         for (Person person : personList) {
-//                ObjectMapper mapper = new ObjectMapper();
-//                String jsonObject = mapper.writeValueAsString(person);
-//                DBObject dbObject = (DBObject) JSON.parse(jsonObject);
-//                collection.get(1).insert(dbObject);
             BasicDBObject doc = new BasicDBObject()
                     .append("name", person.getName())
                     .append("surname", person.getSurname());
             collection.get(1).insert(doc);
 
         }
-//        for (Purchase purchase : purchaseList) {
-//            //ObjectMapper mapper = new ObjectMapper();
-//            //String jsonObject = mapper.writeValueAsString(purchase);
-//            //DBObject dbObject = (DBObject) JSON.parse(jsonObject);
-//            BasicDBObject doc = new BasicDBObject()
-//                    .append("itemName", purchase.getItemName())
-//                    .append("price", purchase.getPrice())
-//                    .append("dateOfPurchase", purchase.getDateOfPurchase());
-//            collection.get(2).insert(doc);
-//        }
-
+        for (Purchase purchase : purchaseList) {
+            BasicDBObject doc = new BasicDBObject()
+                    .append("itemName", purchase.getItemName())
+                    .append("price", purchase.getPrice())
+                    .append("dateOfPurchase", purchase.getDateOfPurchase());
+            collection.get(2).insert(doc);
+        }
     }
 
     private void createConnecntion() throws UnknownHostException {
@@ -111,15 +105,9 @@ public class MongoDB {
         collection.add(db.getCollection("Category"));
         collection.add(db.getCollection("Person"));
         collection.add(db.getCollection("Purchase"));
-        //uncomment this statement to remove all documents from collection
-//        for (DBCollection collectionDB : collection) {
-//            collectionDB.remove(new BasicDBObject());
-//        }
     }
 
     private void closeConnections() {
-        //uncomment this statement to drop collection
-        //collection.drop();
         client.close();
     }
 
@@ -220,29 +208,10 @@ public class MongoDB {
         }
     }
 
-    /**
-     * SELECT SUM(Price) AS Sumatorio, MONTH(DateOfPurchase) AS Mes, CategoryID
-     * FROM Purchase GROUP BY CategoryID ,MONTH(DateOfPurchase);
-     *
-     * @return
-     */
-    private void calculateSum() {
-//        collection.add(db.getCollection("Category"));
-//        DBObject fields = new BasicDBObject("department", 1);
-//        fields.put("price", 1);
-//        fields.put("_id", 0);
-//        DBObject project = new BasicDBObject("$project", fields);
-//        
-//        DBObject groupFields = new BasicDBObject("_id", "$department");
-//        groupFields.put("average", new BasicDBObject("$avg", "$amount"));
-//        DBObject group = new BasicDBObject("$group", groupFields);
-    }
-
-    private void distinct() {
+    private void queries() {
 
         DBCollection coll = db.getCollection("Purchase");
         //find the sum group by category
-        //DBObject project = new BasicDBObject("$project", new BasicDBObject("categoryID", 1) .append("price", 1));
         DBObject group = new BasicDBObject("$group", new BasicDBObject("_id", "$categoryID").append("total", new BasicDBObject("$sum", "$price")));
         DBObject sort = new BasicDBObject("$sort", new BasicDBObject("price", 1));
         AggregationOutput output = coll.aggregate(group, sort);
@@ -255,15 +224,52 @@ public class MongoDB {
         //find the year of date
         //SELECT DISTINCT(YEAR(DateOfPurchase)) AS ano FROM Purchase
         // $group : {_id : { year : {$year : "$birth_date"}},  total : {$sum : 1}
+        System.out.println("SELECT DISTINCT(YEAR(DateOfPurchase)) AS ano FROM Purchase");
         DBCollection collection2 = db.getCollection("Purchase");
         group = new BasicDBObject("$group", new BasicDBObject("_id", new BasicDBObject("year", new BasicDBObject("$year", "$dateOfPurchase"))).append("total", new BasicDBObject("$sum", 1)));
         output = collection2.aggregate(group);
         BasicDBObject basicObj;
         for (DBObject result : output.results()) {
             basicObj = (BasicDBObject) result;
-            basicObj = (BasicDBObject)basicObj.get("_id");
+            basicObj = (BasicDBObject) basicObj.get("_id");
             System.out.println(basicObj.get("year"));;
-            
+
+        }
+
+        System.out.println("////////////////////////////////");
+
+        //find the sum with year and categoryID
+        // SELECT SUM(Price) AS Sumatorio FROM Purchase WHERE CategoryID = ? AND Year(DateOfPurchase) = ?
+        System.out.println("SELECT SUM(Price) AS Sumatorio FROM Purchase WHERE CategoryID = ? AND Year(DateOfPurchase) = ?");
+        int year = 2014;
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, 0, 0);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.set(year, 11, 31);
+        BasicDBObject match = new BasicDBObject(
+                "$match", new BasicDBObject("categoryID", new ObjectId("548089fc46e68338719aa1f8")));
+        match.put("$match", new BasicDBObject("dateOfPurchase", new BasicDBObject("$gte", cal.getTime()).append("$lt", cal2.getTime())));
+        group = new BasicDBObject(
+                "$group", new BasicDBObject("_id", null).append(
+                        "total", new BasicDBObject("$sum", "$price")
+                )
+        );
+        output = coll.aggregate(match, group);
+        for (DBObject result : output.results()) {
+            basicObj = (BasicDBObject) result;
+            System.out.println(basicObj.getDouble("total"));
+        }
+    }
+
+    private void emptyCollections() {
+        for (DBCollection collectionDB : collection) {
+            collectionDB.remove(new BasicDBObject());
+        }
+    }
+
+    private void dropCollections() {
+        for (DBCollection collectionDB : collection) {
+            collectionDB.drop();
         }
     }
 }
